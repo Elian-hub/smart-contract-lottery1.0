@@ -38,6 +38,7 @@ contract Raffle {
     constructor(uint256 entranceFee) {
         i_entranceFee = entranceFee;
     }
+
     function enterRaffle() public payable {
         // require(msg.value >= i_entranceFee, "Not enough ETH sent!");
         if (msg.value < i_entranceFee) {
@@ -47,7 +48,9 @@ contract Raffle {
     }
 
     function pickWinner() public {}
-    /** Getter Function */
+    /**
+     * Getter Function
+     */
 
     function getEntranceFee() external view returns (uint256) {
         return i_entranceFee;
