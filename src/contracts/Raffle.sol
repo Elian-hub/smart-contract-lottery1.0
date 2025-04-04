@@ -38,6 +38,7 @@ contract Raffle {
     address payable[] private s_players;
     uint256 private s_lastTimeStamp;
     /* Events */
+
     event RaffleEntered(address indexed player);
 
     constructor(uint256 entranceFee, uint256 interval) {
