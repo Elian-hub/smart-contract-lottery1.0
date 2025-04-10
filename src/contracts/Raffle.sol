@@ -28,7 +28,6 @@ pragma solidity ^0.8.18;
  * @notice This contract is for creating a sample raffle
  * @dev It implements Chainlink VRFv2.5 and Chainlink Automation
  */
-
 contract Raffle {
     /* errors*/
     error Raffle__NotEnoughEthSent();
@@ -66,7 +65,6 @@ contract Raffle {
     /**
      * Getter Function
      */
-
     function getEntranceFee() external view returns (uint256) {
         return i_entranceFee;
     }
