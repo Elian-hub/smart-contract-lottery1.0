@@ -21,6 +21,7 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.18;
+
 /**
  * @title A sample Raffle Contract
  * @author Elian
@@ -57,8 +58,11 @@ contract Raffle {
     }
 
     function pickWinner() external view {
-        if (block.timestamp - s_lastTimeStamp < i_interval) revert();
+        if (block.timestamp - s_lastTimeStamp < i_interval) {
+            revert();
+        }
     }
+
     /**
      * Getter Function
      */
