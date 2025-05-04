@@ -130,24 +130,14 @@ contract Raffle is VRFConsumerBaseV2 {
     }
 
     function pickWinner() external {
-        require(
-            (block.timestamp - s_lastTimeStamp) >= i_interval,
-            "Interval not met"
-        );
+        require((block.timestamp - s_lastTimeStamp) >= i_interval, "Interval not met");
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
-            i_keyHash,
-            i_subscriptionId,
-            REQUEST_CONFIRMATIONS,
-            i_callbackGasLimit,
-            NUM_WORDS
+            i_keyHash, i_subscriptionId, REQUEST_CONFIRMATIONS, i_callbackGasLimit, NUM_WORDS
         );
         emit RequestedRaffleWinner(requestId);
     }
 
-    function fulfillRandomWords(
-        uint256 requestId,
-        uint256[] memory randomWords
-    ) internal override {
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
         // Implement winner selection logic here
     }
 
