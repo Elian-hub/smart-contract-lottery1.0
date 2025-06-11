@@ -30,6 +30,11 @@ contract Raffle is VRFConsumerBaseV2 {
     error Raffle_SendMoreToEnterRaffle();
     error Raffle__TransferFailed();
     error Raffle__RaffleNotOpen();
+    error Raffle__UpkeepNotNeeded(
+        uint256 balance,
+        uint256 playerLenght,
+        uint256 isOpen
+    );
 
     /*Type Declarations*/
     enum RaffleState {
@@ -95,11 +100,11 @@ contract Raffle is VRFConsumerBaseV2 {
      * 3. The contract has ETH
      * 4. Your subscription has LINK
      * @param - ignored
-     * @return upkeepNeeded as true if it's time to restart the lottery
+     * @return upkeepNeeded - true if it's time to restart the lottery
      * @return - ignored
      */
     function checkUpkeep(
-        bytes calldata /* checkData */
+        bytes memory /* checkData */
     ) public view returns (bool upkeepNeeded, bytes memory /* performData */) {
         bool timePassed = ((block.timestamp - s_lastTimeStamp) >= i_interval);
         bool isOpen = s_raffleState == RaffleState.OPEN;
@@ -109,11 +114,15 @@ contract Raffle is VRFConsumerBaseV2 {
         return (upkeepNeeded, "");
     }
 
-    function pickWinner() external {
-        require(
-            (block.timestamp - s_lastTimeStamp) >= i_interval,
-            "Interval not met"
-        );
+    function performUpkeep(bytes calldata /*performData*/) external {
+        (bool upkeepNeeded, ) = checkUpkeep("");
+        if (!upkeepNeeded) {
+            revert Raffle__UpkeepNotNeeded(
+                address(this).balance,
+                s_players.length,
+                uint256(s_raffleState)
+            );
+        }
         s_raffleState = RaffleState.CALCULATING;
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_keyHash,
