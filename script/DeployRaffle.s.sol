@@ -7,6 +7,7 @@ import {HelperConfig} from "script/HelperConfig.s.sol";
 
 contract DeployRaffle is Script {
     function run() public {}
+
     function deployContract() public returns (Raffle, HelperConfig) {
         HelperConfig helperConfig = new HelperConfig();
         // local -> deploy mocks, get local config
