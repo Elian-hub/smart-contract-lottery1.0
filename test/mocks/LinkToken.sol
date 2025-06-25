@@ -12,17 +12,8 @@ contract LinkToken {
     mapping(address => mapping(address => uint256)) public allowance;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 value,
-        bytes data
-    ); // for transferAndCall
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Transfer(address indexed from, address indexed to, uint256 value, bytes data); // for transferAndCall
 
     constructor() {
         totalSupply = 1_000_000 ether;
@@ -44,11 +35,7 @@ contract LinkToken {
         return true;
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    ) external returns (bool) {
+    function transferFrom(address from, address to, uint256 value) external returns (bool) {
         require(balanceOf[from] >= value, "Insufficient balance");
         require(allowance[from][msg.sender] >= value, "Allowance exceeded");
         allowance[from][msg.sender] -= value;
@@ -65,22 +52,12 @@ contract LinkToken {
     }
 
     /// @notice Mimics LINK's transferAndCall functionality
-    function transferAndCall(
-        address to,
-        uint256 value,
-        bytes calldata data
-    ) external returns (bool success) {
+    function transferAndCall(address to, uint256 value, bytes calldata data) external returns (bool success) {
         require(transfer(to, value), "Transfer failed");
         emit Transfer(msg.sender, to, value, data);
         if (_isContract(to)) {
-            (bool ok, ) = to.call(
-                abi.encodeWithSignature(
-                    "onTokenTransfer(address,uint256,bytes)",
-                    msg.sender,
-                    value,
-                    data
-                )
-            );
+            (bool ok,) =
+                to.call(abi.encodeWithSignature("onTokenTransfer(address,uint256,bytes)", msg.sender, value, data));
             require(ok, "Callback failed");
         }
         return true;
