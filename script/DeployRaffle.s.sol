@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {Script} from "forge-std/Script.sol";
 import {Raffle} from "src/contracts/Raffle.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
-import {CreateSubscription} from "script/Interactions.s.sol";
+import {CreateSubscription, FundSubscription, AddConsumer} from "script/Interactions.s.sol";
 
 contract DeployRaffle is Script {
     function run() public {}
@@ -18,9 +18,23 @@ contract DeployRaffle is Script {
         if (config.subscriptionId == 0) {
             //create subscription
             CreateSubscription createSub = new CreateSubscription();
-            (uint256 subId, address coordinator) = createSub.createSubscription(config.vrfCoordinator);
+            (uint256 subId, address coordinator) = createSub.createSubscription(
+                config.vrfCoordinator
+            );
             config.subscriptionId = uint64(subId);
             config.vrfCoordinator = coordinator;
+
+            //fund it
+            FundSubscription fundSubscription = new FundSubscription();
+            fundSubscription.fundSubscription(
+                config.vrfCoordinator,
+                config.subscriptionId,
+                config.link
+            );
+            //persist the updated config
+            if (block.chainid == helperConfig.LOCAL_CHAIN_ID()) {
+                helperConfig.setLocalConfig(config);
+            }
         }
 
         vm.startBroadcast();
@@ -33,6 +47,14 @@ contract DeployRaffle is Script {
             config.entranceFee
         );
         vm.stopBroadcast();
+
+        AddConsumer addConsumer = new AddConsumer();
+        addConsumer.addConsumer(
+            address(raffle),
+            config.vrfCoordinator,
+            config.subscriptionId
+        );
+
         return (raffle, helperConfig);
     }
 }
