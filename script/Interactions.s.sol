@@ -112,7 +112,3 @@ contract AddConsumer is Script {
         addConsumerUsingConfig(mostRecentlyDeployed);
     }
 }
-
-// contract AddConsumer is Script {
-//     function run() external {}
-// }
